@@ -21,6 +21,13 @@ echo ''
 echo ''
 occ_database
 
+# Complete a supported in-place upgrade before app configuration. Commands such
+# as app:remove are unavailable while Nextcloud is still in upgrade-required
+# mode, which can otherwise leave catalog upgrades stuck in this hook.
+echo ''
+echo '## Upgrading Nextcloud...'
+occ upgrade --no-interaction
+
 echo ''
 # Configure Redis
 if [ "${IX_REDIS:-"true"}" = "true" ]; then
