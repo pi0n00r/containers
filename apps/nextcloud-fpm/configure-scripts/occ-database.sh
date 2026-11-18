@@ -20,7 +20,8 @@ occ_database() {
     dbname "${IX_POSTGRES_NAME:?"IX_POSTGRES_NAME is unset"}" \
     dbuser "${IX_POSTGRES_USER:?"IX_POSTGRES_USER is unset"}" \
     dbpassword "${IX_POSTGRES_PASSWORD:?"IX_POSTGRES_PASSWORD is unset"}" \
-    dbport "${IX_POSTGRES_PORT:-5432}"
+    dbport "${IX_POSTGRES_PORT:-5432}" \
+    datadirectory "${NEXTCLOUD_DATA_DIR:?"NEXTCLOUD_DATA_DIR is unset"}"
 
   # occ config:system:set dbtype --value="pgsql"
   # occ config:system:set dbhost --value="${IX_POSTGRES_HOST:?"IX_POSTGRES_HOST is unset"}"
