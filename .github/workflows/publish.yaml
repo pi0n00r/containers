@@ -1,4 +1,4 @@
-name: Publish Docker image
+name: Publish pi0n00r Nextcloud image
 
 on:
   workflow_dispatch:
@@ -6,14 +6,15 @@ on:
     branches:
       - master
     paths:
-      - apps/**
+      - apps/nextcloud-fpm/**
+      - .github/workflows/publish.yaml
   pull_request:
     paths:
-      - apps/**
+      - apps/nextcloud-fpm/**
+      - .github/workflows/publish.yaml
 
 env:
-  REPOSITORY: ixsystems
-  GHCR_REPOSITORY: ghcr.io/truenas/containers
+  GHCR_REPOSITORY: ghcr.io/pi0n00r
 
 jobs:
   lint:
@@ -52,13 +53,7 @@ jobs:
     strategy:
       matrix:
         containers:
-          - app: tftpd-hpa
-          - app: rsyncd
-          - app: postgres-upgrade
           - app: nextcloud-fpm
-          - app: nextcloud-notify-push
-          - app: container-utils
-          - app: cron
 
     steps:
       - name: Checkout
@@ -88,15 +83,6 @@ jobs:
           echo "No changes detected, skipping build."
           echo "skip=true" >> $GITHUB_OUTPUT
 
-      # Login first so we can pull the manifest
-      # even if the repository is private
-      - name: Login to DockerHub
-        if: steps.detect_changes.outputs.skip == 'false'
-        uses: docker/login-action@v4
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
-
       - name: Login to GHCR
         if: steps.detect_changes.outputs.skip == 'false'
         uses: docker/login-action@v4
@@ -122,7 +108,7 @@ jobs:
           fi
           echo "Version: $VERSION"
 
-          for repository in "${{ env.REPOSITORY }}" "${{ env.GHCR_REPOSITORY }}"; do
+          for repository in "${{ env.GHCR_REPOSITORY }}"; do
             result=$(docker manifest inspect "$repository/${{ matrix.containers.app }}:$VERSION" || echo 1)
 
             # Result contains 1 if the tag does not exist or a JSON object if it does.
@@ -154,10 +140,13 @@ jobs:
         with:
           context: apps/${{ matrix.containers.app }}/
           push: true
-          # Both tags point at the same manifest, so the digest is identical on both registries
           tags: |
-            ${{ env.REPOSITORY }}/${{ matrix.containers.app }}:${{ steps.prepare.outputs.APP_VERSION }}
             ${{ env.GHCR_REPOSITORY }}/${{ matrix.containers.app }}:${{ steps.prepare.outputs.APP_VERSION }}
+          platforms: linux/amd64
+          provenance: mode=max
+          sbom: true
+          build-args: |
+            SOURCE_REVISION=${{ github.sha }}
           # Links the GHCR package to this repository
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}

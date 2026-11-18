@@ -1,4 +1,12 @@
-FROM nextcloud:35.0.3-fpm@sha256:eaf746a8ad73b8eda91704de8d51b68d93aa2e778bcb96ee81df720abd2f076a
+FROM nextcloud:34.0.6-fpm@sha256:3f184efbd94a3812c08206970805351d9a51c6cadb09cabf0a2f400d67385813
+
+ARG SOURCE_REVISION=unknown
+LABEL org.opencontainers.image.title="pi0n00r TrueNAS Community Nextcloud FPM" \
+      org.opencontainers.image.description="Nextcloud 34.0.6 FPM with the TrueNAS Community runtime extensions" \
+      org.opencontainers.image.version="34.0.6" \
+      org.opencontainers.image.revision="${SOURCE_REVISION}" \
+      org.opencontainers.image.source="https://github.com/pi0n00r/containers" \
+      org.opencontainers.image.licenses="AGPL-3.0-or-later"
 
 # Add SURY PHP repository to get c-client library (libc-client2007e-dev)
 # The c-client library is no longer available in Debian Trixie
