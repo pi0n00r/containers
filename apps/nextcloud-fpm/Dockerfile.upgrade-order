@@ -1,0 +1,7 @@
+FROM ghcr.io/pi0n00r/nextcloud-fpm:34.0.6-fpm-9d679b04@sha256:8c76f0f120abcdc1215eb5018fc14b26ac7efab16b72221e1217494b32feac92
+
+ARG SOURCE_REVISION=unknown
+LABEL org.opencontainers.image.revision="${SOURCE_REVISION}" \
+      org.opencontainers.image.description="Nextcloud 34.0.6 FPM with deterministic catalog upgrade ordering"
+
+COPY --chmod=755 ./scripts/post-install.sh /docker-entrypoint-hooks.d/before-starting/10-post-install.sh
